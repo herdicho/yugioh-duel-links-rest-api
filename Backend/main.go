@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -9,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // DB struct for the purpose of database connection
@@ -17,12 +19,49 @@ type DB struct {
 	collection *mgo.Collection
 }
 
+// Character struct for the purpose of query data from database
+type Character struct {
+	ID        bson.ObjectId `json:"id" bson:"_id,omitempty"`
+	Name      string        `json:"name" bson:"name"`
+	World     string        `json:"world" bson:"world"`
+	CurrentLV int           `json:"currentLv" bson:"currentLv"`
+	MaxLV     int           `json:"maxLv" bson:"maxLv"`
+	CharType  int           `json:"charType" bson:"charType"`
+}
+
+// Result struct for the purpose of send response from server
+type Result struct {
+	Code    int         `json:"code"`
+	Payload interface{} `json:"payload"`
+	Message string      `json:"message"`
+}
+
+// GetAllCharacters function for get all of the characters from database
+func (db *DB) GetAllCharacters(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	var characters []Character
+	err := db.collection.Find(bson.M{}).All(&characters)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	} else {
+		res := Result{
+			Code:    200,
+			Payload: characters,
+			Message: "Success get all characters",
+		}
+		w.WriteHeader(http.StatusOK) // give http status (2xx / 3xx / 4xx / 5xx)
+		w.Header().Set("Content-Type", "application/json")
+		response, _ := json.Marshal(res)
+		w.Write(response)
+	}
+}
+
 func main() {
 	// initiate database connection
 	session, err := mgo.Dial("127.0.0.1")
 	c := session.DB("YugiohDuelLinks").C("characters")
 	db := &DB{session: session, collection: c}
-	fmt.Println(db)
 
 	if err != nil {
 		panic(err)
@@ -32,6 +71,8 @@ func main() {
 
 	// create mux router
 	r := mux.NewRouter()
+	// create handler API
+	r.HandleFunc("/character", db.GetAllCharacters).Methods("GET")
 
 	srv := &http.Server{
 		Handler:      r,
