@@ -1,3 +1,30 @@
 h1  {
-    color: beige;
+    text-align: center;
 }
+
+body {
+    background-image: linear-gradient(120deg, #99ffb3, #f5ca91);
+    color: black;
+    font-family: 'Muli';
+}
+
+.character-list-by-world-container {
+    display: flex;
+    height:800px;
+    justify-content: space-between;
+}
+
+.character-dm-container, .character-dsod-container, .character-gx-container, .character-5ds-container, .character-zexal-container  {
+    width: 20%;
+    height: 50%;
+    border: 3px black solid;
+    margin: 0px 5px;
+}
+
+.title {
+    margin-top: 10px;
+    font-size: 28px;
+    text-align: center;
+    font-weight: bold;
+}
+
