@@ -126,10 +126,36 @@ func (db *DB) PostCharacter(w http.ResponseWriter, r *http.Request) {
 		res := Result{
 			Code:    200,
 			Payload: character,
-			Message: "Success Create New Character",
+			Message: "Success create new character",
 		}
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated) // give http status (2xx, 3xx, 4xx, 5xx)
+		response, _ := json.Marshal(res)
+		w.Write(response)
+	}
+}
+
+// DeleteCharacter function for delete character by id
+func (db *DB) DeleteCharacter(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	// get slug parameter url (id character to delete)
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	var character Character
+	db.collection.Find(bson.M{"_id": bson.ObjectIdHex(id)}).One(&character)
+	err := db.collection.Remove(bson.M{"_id": bson.ObjectIdHex(id)})
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	} else {
+		res := Result{
+			Code:    200,
+			Payload: character,
+			Message: "Success delete character",
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK) // give http status (2xx, 3xx, 4xx, 5xx)
 		response, _ := json.Marshal(res)
 		w.Write(response)
 	}
@@ -154,6 +180,7 @@ func main() {
 	r.HandleFunc("/character-max-lv", db.GetAllMaxLvCharacters).Methods("GET")
 	r.HandleFunc("/character-by-world/{world:[a-zA-Z]*}", db.GetAllCharactersByWorld).Methods("GET")
 	r.HandleFunc("/character", db.PostCharacter).Methods("POST")
+	r.HandleFunc("/character/{id:[a-zA-Z0-9]*}", db.DeleteCharacter).Methods("DELETE")
 	srv := &http.Server{
 		Handler:      r,
 		Addr:         "127.0.0.1:8000",
