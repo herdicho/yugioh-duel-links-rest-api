@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -82,6 +83,29 @@ func (db *DB) GetAllMaxLvCharacters(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetAllCharactersByWorld function for get all character by world (url param world)
+func (db *DB) GetAllCharactersByWorld(w http.ResponseWriter, r *http.Request) {
+	// get slug parameter url and change to upper case
+	vars := mux.Vars(r)
+	world := strings.ToUpper(vars["world"])
+
+	var characters []Character
+	err := db.collection.Find(bson.M{"world": world}).All(&characters)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	} else {
+		res := Result{
+			Code:    200,
+			Payload: characters,
+			Message: "Success get all character from " + world + " world",
+		}
+		w.WriteHeader(http.StatusOK) // give http status (2xx, 3xx, 4xx, 5xx)
+		w.Header().Set("Content-Type", "application/json")
+		response, _ := json.Marshal(res)
+		w.Write(response)
+	}
+}
+
 func main() {
 	// initiate database connection
 	session, err := mgo.Dial("127.0.0.1")
@@ -99,7 +123,7 @@ func main() {
 	// create handler API
 	r.HandleFunc("/character", db.GetAllCharacters).Methods("GET")
 	r.HandleFunc("/character-max-lv", db.GetAllMaxLvCharacters).Methods("GET")
-
+	r.HandleFunc("/character-by-world/{world:[a-zA-Z]*}", db.GetAllCharactersByWorld).Methods("GET")
 	srv := &http.Server{
 		Handler:      r,
 		Addr:         "127.0.0.1:8000",
