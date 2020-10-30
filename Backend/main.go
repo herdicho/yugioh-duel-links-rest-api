@@ -161,6 +161,34 @@ func (db *DB) DeleteCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// UpdateCharacter function for update character
+func (db *DB) UpdateCharacter(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	// get slug parameter url (id character to update)
+	vars := mux.Vars(r)
+	id := vars["id"]
+
+	var character Character
+	putBody, _ := ioutil.ReadAll(r.Body)
+	json.Unmarshal(putBody, &character)
+
+	err := db.collection.Update(bson.M{"_id": bson.ObjectIdHex(id)}, bson.M{"$set": &character})
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	} else {
+		res := Result{
+			Code:    200,
+			Payload: character,
+			Message: "Success update character",
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated) // give http status (2xx, 3xx, 4xx, 5xx)
+		response, _ := json.Marshal(res)
+		w.Write(response)
+	}
+}
+
 func main() {
 	// initiate database connection
 	session, err := mgo.Dial("127.0.0.1")
@@ -181,6 +209,7 @@ func main() {
 	r.HandleFunc("/character-by-world/{world:[a-zA-Z]*}", db.GetAllCharactersByWorld).Methods("GET")
 	r.HandleFunc("/character", db.PostCharacter).Methods("POST")
 	r.HandleFunc("/character/{id:[a-zA-Z0-9]*}", db.DeleteCharacter).Methods("DELETE")
+	r.HandleFunc("/character/{id:[a-zA-Z0-9]*}", db.UpdateCharacter).Methods("PUT")
 	srv := &http.Server{
 		Handler:      r,
 		Addr:         "127.0.0.1:8000",
