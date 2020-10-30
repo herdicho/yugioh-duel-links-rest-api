@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -85,6 +86,8 @@ func (db *DB) GetAllMaxLvCharacters(w http.ResponseWriter, r *http.Request) {
 
 // GetAllCharactersByWorld function for get all character by world (url param world)
 func (db *DB) GetAllCharactersByWorld(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
 	// get slug parameter url and change to upper case
 	vars := mux.Vars(r)
 	world := strings.ToUpper(vars["world"])
@@ -101,6 +104,32 @@ func (db *DB) GetAllCharactersByWorld(w http.ResponseWriter, r *http.Request) {
 		}
 		w.WriteHeader(http.StatusOK) // give http status (2xx, 3xx, 4xx, 5xx)
 		w.Header().Set("Content-Type", "application/json")
+		response, _ := json.Marshal(res)
+		w.Write(response)
+	}
+}
+
+// PostCharacter function for create (post) the new character
+func (db *DB) PostCharacter(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+
+	var character Character
+	postBody, _ := ioutil.ReadAll(r.Body)
+	json.Unmarshal(postBody, &character)
+
+	// Create a Hash ID to insert
+	character.ID = bson.NewObjectId()
+	err := db.collection.Insert(character)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	} else {
+		res := Result{
+			Code:    200,
+			Payload: character,
+			Message: "Success Create New Character",
+		}
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusCreated) // give http status (2xx, 3xx, 4xx, 5xx)
 		response, _ := json.Marshal(res)
 		w.Write(response)
 	}
@@ -124,6 +153,7 @@ func main() {
 	r.HandleFunc("/character", db.GetAllCharacters).Methods("GET")
 	r.HandleFunc("/character-max-lv", db.GetAllMaxLvCharacters).Methods("GET")
 	r.HandleFunc("/character-by-world/{world:[a-zA-Z]*}", db.GetAllCharactersByWorld).Methods("GET")
+	r.HandleFunc("/character", db.PostCharacter).Methods("POST")
 	srv := &http.Server{
 		Handler:      r,
 		Addr:         "127.0.0.1:8000",
