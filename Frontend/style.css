@@ -1,0 +1,115 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+h1  {
+    margin-top: 30px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+body {
+    background-image: linear-gradient(120deg, #99ffb3, #f5ca91);
+    color: black;
+    font-family: 'Muli';
+}
+
+i {
+    cursor: pointer;
+}
+
+.fa-marker:hover {
+    color: yellow;
+}
+
+.fa-trash:hover {
+    color: red;
+}
+
+.character-list-by-world-container {
+    display: grid;
+    grid-template-areas: 
+    'sess1 sess2 sess3'
+    'sess4 sess5 sess6';
+    grid-gap: 10px;
+    padding: 10px;
+}
+
+.character-list-by-world-container > div {
+    min-height: 500px;
+    width: 450px;
+    border: 2px solid black;
+    margin-bottom: 50px;
+}
+
+.input-new-character-container {
+    grid-area: sess1;
+}
+
+.character-dm-container {
+    grid-area: sess2;
+}
+
+.character-dsod-container {
+    grid-area: sess3;
+}
+
+.character-gx-container {
+    grid-area: sess4;
+}
+
+.character-5ds-container {
+    grid-area: sess5;
+}
+
+.character-zexal-container {
+    grid-area: sess6;
+}
+
+.title {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-size: 28px;
+    text-align: center;
+    font-weight: bold;
+}
+
+table, td, th {
+    border: 1px solid black;
+    padding: 5px;
+}
+
+table {
+    width: 95%;
+    border-collapse: collapse;
+    font-size: 16px;
+    text-align: center;
+    margin: 10px auto;
+}
+
+form {
+    margin-left: 19%;
+    margin-right:11%;
+    width: 70%;
+}
+
+input[type=text] {
+    height: 10px;
+    width: 90%;
+    padding: 15px 5px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}
+
+input[type=submit] {
+    height: auto;
+    width: 90%;
+    padding: 5px 5px;
+    margin: 8px 0;
+    box-sizing: border-box;
+    cursor: pointer;
+}
