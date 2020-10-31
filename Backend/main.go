@@ -93,7 +93,7 @@ func (db *DB) GetAllCharactersByWorld(w http.ResponseWriter, r *http.Request) {
 	world := strings.ToUpper(vars["world"])
 
 	var characters []Character
-	err := db.collection.Find(bson.M{"world": world}).All(&characters)
+	err := db.collection.Find(bson.M{"world": world}).Sort("-$natural").All(&characters) //Sort("-$natural") = sort descending (ambil database dari bawah)
 	if err != nil {
 		w.Write([]byte(err.Error()))
 	} else {
@@ -206,7 +206,7 @@ func main() {
 	// create handler API
 	r.HandleFunc("/character", db.GetAllCharacters).Methods("GET")
 	r.HandleFunc("/character-max-lv", db.GetAllMaxLvCharacters).Methods("GET")
-	r.HandleFunc("/character-by-world/{world:[a-zA-Z]*}", db.GetAllCharactersByWorld).Methods("GET")
+	r.HandleFunc("/character-by-world/{world:[a-zA-Z0-9]*}", db.GetAllCharactersByWorld).Methods("GET")
 	r.HandleFunc("/character", db.PostCharacter).Methods("POST")
 	r.HandleFunc("/character/{id:[a-zA-Z0-9]*}", db.DeleteCharacter).Methods("DELETE")
 	r.HandleFunc("/character/{id:[a-zA-Z0-9]*}", db.UpdateCharacter).Methods("PUT")
