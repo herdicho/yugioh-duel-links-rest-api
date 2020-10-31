@@ -1,3 +1,9 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 h1  {
     text-align: center;
 }
@@ -8,17 +14,58 @@ body {
     font-family: 'Muli';
 }
 
-.character-list-by-world-container {
-    display: flex;
-    height:800px;
-    justify-content: space-between;
+i {
+    cursor: pointer;
 }
 
-.character-dm-container, .character-dsod-container, .character-gx-container, .character-5ds-container, .character-zexal-container  {
-    width: 20%;
-    height: 50%;
-    border: 3px black solid;
-    margin: 0px 5px;
+.fa-marker:hover {
+    color: yellow;
+}
+
+.fa-trash:hover {
+    color: red;
+}
+
+.character-list-by-world-container {
+    display: grid;
+    grid-template-areas: 
+    'sess1 sess2 sess3'
+    'sess4 sess5 sess6';
+    grid-gap: 10px;
+    padding: 10px;
+}
+
+.character-list-by-world-container > div {
+    text-align: center;
+    padding: 20px 0;
+    height : 500px;
+    width: 450px;
+    border: 2px solid black;
+}
+
+.input-new-character-container {
+    grid-area: sess1;
+}
+
+.character-dm-container {
+    grid-area: sess2;
+    padding: 0px 10px;
+}
+
+.character-dsod-container {
+    grid-area: sess3;
+}
+
+.character-gx-container {
+    grid-area: sess4;
+}
+
+.character-5ds-container {
+    grid-area: sess5;
+}
+
+.character-zexal-container {
+    grid-area: sess6;
 }
 
 .title {
@@ -28,3 +75,15 @@ body {
     font-weight: bold;
 }
 
+table, td, th {
+    border: 1px solid black;
+    padding: 5px;
+}
+
+table {
+    width: 95%;
+    border-collapse: collapse;
+    font-size: 16px;
+    text-align: center;
+    margin: 10px auto;
+}
