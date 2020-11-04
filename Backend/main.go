@@ -40,7 +40,10 @@ type Result struct {
 
 // GetAllCharacters function for get all of the characters from database
 func (db *DB) GetAllCharacters(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	header := w.Header()
+	header.Add("Access-Control-Allow-Origin", "*")
+	header.Add("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
+	header.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
 
 	var characters []Character
 	err := db.collection.Find(bson.M{}).All(&characters)
@@ -61,7 +64,10 @@ func (db *DB) GetAllCharacters(w http.ResponseWriter, r *http.Request) {
 
 // GetAllMaxLvCharacters function for get all of the characters from database that already on max lv
 func (db *DB) GetAllMaxLvCharacters(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	header := w.Header()
+	header.Add("Access-Control-Allow-Origin", "*")
+	header.Add("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
+	header.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
 
 	var characters []Character
 	err := db.collection.Find(bson.M{
@@ -86,7 +92,10 @@ func (db *DB) GetAllMaxLvCharacters(w http.ResponseWriter, r *http.Request) {
 
 // GetAllCharactersByWorld function for get all character by world (url param world)
 func (db *DB) GetAllCharactersByWorld(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	header := w.Header()
+	header.Add("Access-Control-Allow-Origin", "*")
+	header.Add("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
+	header.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
 
 	// get slug parameter url and change to upper case
 	vars := mux.Vars(r)
@@ -111,7 +120,10 @@ func (db *DB) GetAllCharactersByWorld(w http.ResponseWriter, r *http.Request) {
 
 // PostCharacter function for create (post) the new character
 func (db *DB) PostCharacter(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	header := w.Header()
+	header.Add("Access-Control-Allow-Origin", "*")
+	header.Add("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
+	header.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
 
 	var character Character
 	postBody, _ := ioutil.ReadAll(r.Body)
@@ -137,7 +149,10 @@ func (db *DB) PostCharacter(w http.ResponseWriter, r *http.Request) {
 
 // DeleteCharacter function for delete character by id
 func (db *DB) DeleteCharacter(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	header := w.Header()
+	header.Add("Access-Control-Allow-Origin", "*")
+	header.Add("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
+	header.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
 
 	// get slug parameter url (id character to delete)
 	vars := mux.Vars(r)
@@ -163,7 +178,10 @@ func (db *DB) DeleteCharacter(w http.ResponseWriter, r *http.Request) {
 
 // UpdateCharacter function for update character
 func (db *DB) UpdateCharacter(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	header := w.Header()
+	header.Add("Access-Control-Allow-Origin", "*")
+	header.Add("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
+	header.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
 
 	// get slug parameter url (id character to update)
 	vars := mux.Vars(r)
