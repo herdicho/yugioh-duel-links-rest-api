@@ -25,8 +25,33 @@ const loadCharactersListbyWorld = world => {
         newHtml = newHtml.replace('%maxLv%', element.maxLv)
         newHtml = newHtml.replace('"%id%"', element.id)
         elementByWorld.insertAdjacentHTML('afterend', newHtml);
-    }))
+    })).
+    catch(error => console.log(`Failed to fetch world ${world} because there is no character on this world`))
 } 
+
+function deleteCharacter(id) {
+    console.log('fuk')
+    const url = "http://localhost:8000/character/"
+    const api = url.concat(id)
+
+    fetch(api, {
+        method : 'DELETE',
+    }).
+    then(res => res.json()).
+    then(console.log("Success Delete Character"))
+
+    window.location.reload();
+}
+
+function characterAction(event) {
+    let id;
+    if (event.target.classList[1] === "fa-marker")
+        console.log('update id : ', event.target.parentElement.parentElement.id)
+    else if (event.target.classList[1] === "fa-trash") {
+        id = event.target.parentElement.parentElement.id;
+        deleteCharacter(id)
+    }
+}
 
 const getElementByWorld = world => {
     if (world === "dm") {
@@ -43,8 +68,16 @@ const getElementByWorld = world => {
 }
 
 const controller = () => {
-    window.addEventListener('load', () => {
 
+    var DOMstrings = {
+        DMContainer: '.character-dm-container',
+        DSODContainer: '.character-dsod-container',
+        GXContainer: '.character-gx-container',
+        FiveDSContainer: '.character-5ds-container',
+        ZexalContainer: '.character-zexal-container',
+    };
+
+    window.addEventListener('load', () => {
         console.log("Apps Is Running")
        
         // load all characters list on each world
@@ -54,6 +87,12 @@ const controller = () => {
         loadCharactersListbyWorld("5ds")
         loadCharactersListbyWorld("zexal")
     });
+
+    document.querySelector(DOMstrings.DMContainer).addEventListener('click', event => characterAction(event));
+    document.querySelector(DOMstrings.DSODContainer).addEventListener('click', event => characterAction(event));
+    document.querySelector(DOMstrings.GXContainer).addEventListener('click', event => characterAction(event));
+    document.querySelector(DOMstrings.FiveDSContainer).addEventListener('click', event => characterAction(event));
+    document.querySelector(DOMstrings.ZexalContainer).addEventListener('click', event => characterAction(event));
 }
 
 controller()
