@@ -30,7 +30,6 @@ const loadCharactersListbyWorld = world => {
 } 
 
 function deleteCharacter(id) {
-    console.log('fuk')
     const url = "http://localhost:8000/character/"
     const api = url.concat(id)
 
@@ -43,11 +42,39 @@ function deleteCharacter(id) {
     window.location.reload();
 }
 
-function characterAction(event) {
+function updateCharacter(id, characterData) {
+    /*const url = "http://localhost:8000/character/"
+    const api = url.concat(id)
+
+    fetch(api, {
+        method : 'DELETE',
+    }).
+    then(res => res.json()).
+    then(console.log("Success Delete Character"))
+
+    window.location.reload();*/
+    const nameField = document.getElementById("name")
+    nameField.value = characterData.name
+    const worldField = document.getElementById("world")
+    worldField.value = characterData.world
+    const currentLvField = document.getElementById("currentLv")
+    currentLvField.value = characterData.currentLv
+    const maxLvField = document.getElementById("maxLv")
+    maxLvField.value = characterData.maxLv
+}
+
+function characterAction(event, world) {
     let id;
-    if (event.target.classList[1] === "fa-marker")
-        console.log('update id : ', event.target.parentElement.parentElement.id)
-    else if (event.target.classList[1] === "fa-trash") {
+    if (event.target.classList[1] === "fa-marker") {
+        const characterData = {
+            name : event.target.parentElement.parentElement.children[0].innerHTML,
+            world : world,
+            currentLv : event.target.parentElement.parentElement.children[1].innerHTML,
+            maxLv : event.target.parentElement.parentElement.children[2].innerHTML,
+        }
+        id = event.target.parentElement.parentElement.id;
+        updateCharacter(id, characterData)
+    } else if (event.target.classList[1] === "fa-trash") {
         id = event.target.parentElement.parentElement.id;
         deleteCharacter(id)
     }
@@ -88,11 +115,11 @@ const controller = () => {
         loadCharactersListbyWorld("zexal")
     });
 
-    document.querySelector(DOMstrings.DMContainer).addEventListener('click', event => characterAction(event));
-    document.querySelector(DOMstrings.DSODContainer).addEventListener('click', event => characterAction(event));
-    document.querySelector(DOMstrings.GXContainer).addEventListener('click', event => characterAction(event));
-    document.querySelector(DOMstrings.FiveDSContainer).addEventListener('click', event => characterAction(event));
-    document.querySelector(DOMstrings.ZexalContainer).addEventListener('click', event => characterAction(event));
+    document.querySelector(DOMstrings.DMContainer).addEventListener('click', event => characterAction(event, "DM"));
+    document.querySelector(DOMstrings.DSODContainer).addEventListener('click', event => characterAction(event, "DM"));
+    document.querySelector(DOMstrings.GXContainer).addEventListener('click', event => characterAction(event, "DM"));
+    document.querySelector(DOMstrings.FiveDSContainer).addEventListener('click', event => characterAction(event, "DM"));
+    document.querySelector(DOMstrings.ZexalContainer).addEventListener('click', event => characterAction(event, "DM"));
 }
 
 controller()
