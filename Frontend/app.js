@@ -36,7 +36,6 @@ function deleteCharacter(id) {
     fetch(api, {
         method : 'DELETE',
     }).
-    then(res => res.json()).
     then(console.log("Success Delete Character"))
 
     window.location.reload();
@@ -116,10 +115,10 @@ const controller = () => {
     });
 
     document.querySelector(DOMstrings.DMContainer).addEventListener('click', event => characterAction(event, "DM"));
-    document.querySelector(DOMstrings.DSODContainer).addEventListener('click', event => characterAction(event, "DM"));
-    document.querySelector(DOMstrings.GXContainer).addEventListener('click', event => characterAction(event, "DM"));
-    document.querySelector(DOMstrings.FiveDSContainer).addEventListener('click', event => characterAction(event, "DM"));
-    document.querySelector(DOMstrings.ZexalContainer).addEventListener('click', event => characterAction(event, "DM"));
+    document.querySelector(DOMstrings.DSODContainer).addEventListener('click', event => characterAction(event, "DSOD"));
+    document.querySelector(DOMstrings.GXContainer).addEventListener('click', event => characterAction(event, "GX"));
+    document.querySelector(DOMstrings.FiveDSContainer).addEventListener('click', event => characterAction(event, "5DS"));
+    document.querySelector(DOMstrings.ZexalContainer).addEventListener('click', event => characterAction(event, "Zexal"));
 }
 
 controller()

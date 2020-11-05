@@ -7,8 +7,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
 	"gopkg.in/mgo.v2"
@@ -40,11 +40,6 @@ type Result struct {
 
 // GetAllCharacters function for get all of the characters from database
 func (db *DB) GetAllCharacters(w http.ResponseWriter, r *http.Request) {
-	header := w.Header()
-	header.Add("Access-Control-Allow-Origin", "*")
-	header.Add("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
-	header.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
-
 	var characters []Character
 	err := db.collection.Find(bson.M{}).All(&characters)
 	if err != nil {
@@ -64,11 +59,6 @@ func (db *DB) GetAllCharacters(w http.ResponseWriter, r *http.Request) {
 
 // GetAllMaxLvCharacters function for get all of the characters from database that already on max lv
 func (db *DB) GetAllMaxLvCharacters(w http.ResponseWriter, r *http.Request) {
-	header := w.Header()
-	header.Add("Access-Control-Allow-Origin", "*")
-	header.Add("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
-	header.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
-
 	var characters []Character
 	err := db.collection.Find(bson.M{
 		"$expr": bson.M{
@@ -92,11 +82,6 @@ func (db *DB) GetAllMaxLvCharacters(w http.ResponseWriter, r *http.Request) {
 
 // GetAllCharactersByWorld function for get all character by world (url param world)
 func (db *DB) GetAllCharactersByWorld(w http.ResponseWriter, r *http.Request) {
-	header := w.Header()
-	header.Add("Access-Control-Allow-Origin", "*")
-	header.Add("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
-	header.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
-
 	// get slug parameter url and change to upper case
 	vars := mux.Vars(r)
 	world := strings.ToUpper(vars["world"])
@@ -120,10 +105,10 @@ func (db *DB) GetAllCharactersByWorld(w http.ResponseWriter, r *http.Request) {
 
 // PostCharacter function for create (post) the new character
 func (db *DB) PostCharacter(w http.ResponseWriter, r *http.Request) {
-	header := w.Header()
+	/*header := w.Header()
 	header.Add("Access-Control-Allow-Origin", "*")
 	header.Add("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
-	header.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
+	header.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")*/
 
 	var character Character
 	postBody, _ := ioutil.ReadAll(r.Body)
@@ -149,11 +134,6 @@ func (db *DB) PostCharacter(w http.ResponseWriter, r *http.Request) {
 
 // DeleteCharacter function for delete character by id
 func (db *DB) DeleteCharacter(w http.ResponseWriter, r *http.Request) {
-	header := w.Header()
-	header.Add("Access-Control-Allow-Origin", "*")
-	header.Add("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
-	header.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
-
 	// get slug parameter url (id character to delete)
 	vars := mux.Vars(r)
 	id := vars["id"]
@@ -228,12 +208,10 @@ func main() {
 	r.HandleFunc("/character", db.PostCharacter).Methods("POST")
 	r.HandleFunc("/character/{id:[a-zA-Z0-9]*}", db.DeleteCharacter).Methods("DELETE")
 	r.HandleFunc("/character/{id:[a-zA-Z0-9]*}", db.UpdateCharacter).Methods("PUT")
-	srv := &http.Server{
-		Handler:      r,
-		Addr:         "127.0.0.1:8000",
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}
+
+	headers := handlers.AllowedHeaders([]string{"X-Requested-With", "Content-Type", "Authorization"})
+	methods := handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE"})
+	origins := handlers.AllowedHeaders([]string{"*"})
+	log.Fatal(http.ListenAndServe(":8000", handlers.CORS(headers, methods, origins)(r)))
 	fmt.Println("Server is running")
-	log.Fatal(srv.ListenAndServe())
 }
