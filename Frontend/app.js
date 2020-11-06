@@ -4,6 +4,11 @@ const elements = {
     GXCharacterListTable: document.querySelector('.character-gx-container').children[1].children[0].children[0],
     FiveDSCharacterListTable: document.querySelector('.character-5ds-container').children[1].children[0].children[0],
     ZexalCharacterListTable: document.querySelector('.character-zexal-container').children[1].children[0].children[0],
+    nameField : document.getElementById("name"),
+    worldField : document.getElementById("world"),
+    currentLvField : document.getElementById("currentLv"),
+    maxLvField : document.getElementById("maxLv"),
+    charTypeField : document.getElementById("charType"),
 }
 
 const loadCharactersListbyWorld = world => { 
@@ -36,8 +41,7 @@ function deleteCharacter(id) {
 
     fetch(api, {
         method : 'DELETE',
-    }).
-    then(console.log("Success Delete Character"))
+    })
 
     window.location.reload();
 }
@@ -53,14 +57,11 @@ function updateCharacter(id, characterData) {
     then(console.log("Success Delete Character"))
 
     window.location.reload();*/
-    const nameField = document.getElementById("name")
-    nameField.value = characterData.name
-    const worldField = document.getElementById("world")
-    worldField.value = characterData.world
-    const currentLvField = document.getElementById("currentLv")
-    currentLvField.value = characterData.currentLv
-    const maxLvField = document.getElementById("maxLv")
-    maxLvField.value = characterData.maxLv
+    elements.nameField.value = characterData.name
+    elements.worldField.value = characterData.world
+    elements.currentLvField.value = characterData.currentLv
+    elements.maxLvField.value = characterData.maxLv
+    elements.charTypeField.value = characterData.charType
 }
 
 function characterAction(event, world) {
@@ -71,6 +72,7 @@ function characterAction(event, world) {
             world : world,
             currentLv : event.target.parentElement.parentElement.children[1].innerHTML,
             maxLv : event.target.parentElement.parentElement.children[2].innerHTML,
+            charType : event.target.parentElement.parentElement.children[3].innerHTML,
         }
         id = event.target.parentElement.parentElement.id;
         updateCharacter(id, characterData)
@@ -83,8 +85,21 @@ function characterAction(event, world) {
 function addNewCharacter(event) {
     event.preventDefault()
     const characterData = {
-        name 
+        name : elements.nameField.value,
+        world : elements.worldField.value.toUpperCase(),
+        currentLv : parseInt(elements.currentLvField.value),
+        maxLv : parseInt(elements.maxLvField.value),
+        charType : parseInt(elements.charTypeField.value),
     }
+
+    const url = "http://localhost:8000/character"
+    
+    fetch(url, {
+        method: 'post',
+        body: JSON.stringify(characterData)
+      })
+
+   window.location.reload();
 }
 
 const getElementByWorld = world => {
