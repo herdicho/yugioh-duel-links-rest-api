@@ -16,13 +16,14 @@ const loadCharactersListbyWorld = world => {
     then(res => res.json()).
     then(res => res.payload.forEach(element => {
         if (element.maxLv !== element.currentLv)
-            html = '<tr id="%id%"> <td>%name%</td> <td>%curLv%</td> <td>%maxLv%</td> <th><i class="fas fa-marker"></i></th> <th><i class="fas fa-trash"></i></th> </tr>'
+            html = '<tr id="%id%"> <td>%name%</td> <td>%curLv%</td> <td>%maxLv%</td> <td>%charType%</td> <th><i class="fas fa-marker"></i></th> <th><i class="fas fa-trash"></i></th> </tr>'
         else
-            html = '<tr id="%id%"> <td class="max-lvl">%name%</td> <td class="max-lvl">%curLv%</td> <td class="max-lvl">%maxLv%</td> <th class="max-lvl"><i class="fas fa-marker"></i></th> <th class="max-lvl"><i class="fas fa-trash"></i></th> </tr>'
+            html = '<tr id="%id%"> <td class="max-lvl">%name%</td> <td class="max-lvl">%curLv%</td> <td class="max-lvl">%maxLv%</td> <td class="max-lvl">%charType%</td> <th class="max-lvl"><i class="fas fa-marker"></i></th> <th class="max-lvl"><i class="fas fa-trash"></i></th> </tr>'
         
         newHtml = html.replace('%name%', element.name)
         newHtml = newHtml.replace('%curLv%', element.currentLv)
         newHtml = newHtml.replace('%maxLv%', element.maxLv)
+        newHtml = newHtml.replace('%charType%', element.charType)
         newHtml = newHtml.replace('"%id%"', element.id)
         elementByWorld.insertAdjacentHTML('afterend', newHtml);
     })).
@@ -79,6 +80,13 @@ function characterAction(event, world) {
     }
 }
 
+function addNewCharacter(event) {
+    event.preventDefault()
+    const characterData = {
+        name 
+    }
+}
+
 const getElementByWorld = world => {
     if (world === "dm") {
         return elements.DMCharacterListTable
@@ -101,6 +109,7 @@ const controller = () => {
         GXContainer: '.character-gx-container',
         FiveDSContainer: '.character-5ds-container',
         ZexalContainer: '.character-zexal-container',
+        SubmitButton: 'input-form',
     };
 
     window.addEventListener('load', () => {
@@ -119,6 +128,7 @@ const controller = () => {
     document.querySelector(DOMstrings.GXContainer).addEventListener('click', event => characterAction(event, "GX"));
     document.querySelector(DOMstrings.FiveDSContainer).addEventListener('click', event => characterAction(event, "5DS"));
     document.querySelector(DOMstrings.ZexalContainer).addEventListener('click', event => characterAction(event, "Zexal"));
+    document.getElementById(DOMstrings.SubmitButton).addEventListener('submit', event => addNewCharacter(event));
 }
 
 controller()
