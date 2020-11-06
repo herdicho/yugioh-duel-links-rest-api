@@ -158,11 +158,6 @@ func (db *DB) DeleteCharacter(w http.ResponseWriter, r *http.Request) {
 
 // UpdateCharacter function for update character
 func (db *DB) UpdateCharacter(w http.ResponseWriter, r *http.Request) {
-	header := w.Header()
-	header.Add("Access-Control-Allow-Origin", "*")
-	header.Add("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS")
-	header.Add("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With")
-
 	// get slug parameter url (id character to update)
 	vars := mux.Vars(r)
 	id := vars["id"]

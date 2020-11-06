@@ -9,6 +9,17 @@ const elements = {
     currentLvField : document.getElementById("currentLv"),
     maxLvField : document.getElementById("maxLv"),
     charTypeField : document.getElementById("charType"),
+    formField : document.getElementById("input-form"),
+}
+
+let idCharacter = "";
+
+let characterData = {
+    name : "",
+    world : "",
+    currentLv : "",
+    maxLv : "",
+    charType : "",
 }
 
 const loadCharactersListbyWorld = world => { 
@@ -35,9 +46,9 @@ const loadCharactersListbyWorld = world => {
     catch(error => console.log(`Failed to fetch world ${world} because there is no character on this world`))
 } 
 
-function deleteCharacter(id) {
+function deleteCharacter() {
     const url = "http://localhost:8000/character/"
-    const api = url.concat(id)
+    const api = url.concat(idCharacter)
 
     fetch(api, {
         method : 'DELETE',
@@ -46,17 +57,12 @@ function deleteCharacter(id) {
     window.location.reload();
 }
 
-function updateCharacter(id, characterData) {
-    /*const url = "http://localhost:8000/character/"
-    const api = url.concat(id)
-
-    fetch(api, {
-        method : 'DELETE',
-    }).
-    then(res => res.json()).
-    then(console.log("Success Delete Character"))
-
-    window.location.reload();*/
+function outputCurrentDataToForm() {
+    // change class (flag) of input form for marker process POST or PUT data
+    elements.formField.classList.add("update-form")
+    elements.formField.classList.remove("post-form")
+    
+    //console.log(characterData)
     elements.nameField.value = characterData.name
     elements.worldField.value = characterData.world
     elements.currentLvField.value = characterData.currentLv
@@ -65,21 +71,47 @@ function updateCharacter(id, characterData) {
 }
 
 function characterAction(event, world) {
-    let id;
+    idCharacter = event.target.parentElement.parentElement.id;
     if (event.target.classList[1] === "fa-marker") {
-        const characterData = {
-            name : event.target.parentElement.parentElement.children[0].innerHTML,
-            world : world,
-            currentLv : event.target.parentElement.parentElement.children[1].innerHTML,
-            maxLv : event.target.parentElement.parentElement.children[2].innerHTML,
-            charType : event.target.parentElement.parentElement.children[3].innerHTML,
-        }
-        id = event.target.parentElement.parentElement.id;
-        updateCharacter(id, characterData)
+        characterData.name = event.target.parentElement.parentElement.children[0].innerHTML
+        characterData.world = world
+        characterData.currentLv = event.target.parentElement.parentElement.children[1].innerHTML
+        characterData.maxLv = event.target.parentElement.parentElement.children[2].innerHTML
+        characterData.charType = event.target.parentElement.parentElement.children[3].innerHTML
+        
+        outputCurrentDataToForm(characterData)
     } else if (event.target.classList[1] === "fa-trash") {
-        id = event.target.parentElement.parentElement.id;
-        deleteCharacter(id)
+        deleteCharacter()
     }
+}
+
+function formAction (event) {
+    event.preventDefault()
+    const statusForm = event.target.classList[0]
+    if (statusForm === "post-form")
+        addNewCharacter(event)
+    else if (statusForm === "update-form")
+        updateCharacter(event)
+}
+
+function updateCharacter(event) {
+    event.preventDefault()
+
+    characterData.name = elements.nameField.value
+    characterData.world = elements.worldField.value.toUpperCase()
+    characterData.currentLv = parseInt(elements.currentLvField.value)
+    characterData.maxLv = parseInt(elements.maxLvField.value)
+    characterData.charType = parseInt(elements.charTypeField.value)
+
+    const url = "http://localhost:8000/character/"
+    const api = url.concat(idCharacter)
+    
+    fetch(api, {
+        method: 'PUT',
+        body: JSON.stringify(characterData)
+      })
+
+    window.location.reload();
 }
 
 function addNewCharacter(event) {
@@ -95,7 +127,7 @@ function addNewCharacter(event) {
     const url = "http://localhost:8000/character"
     
     fetch(url, {
-        method: 'post',
+        method: 'POST',
         body: JSON.stringify(characterData)
       })
 
@@ -143,7 +175,7 @@ const controller = () => {
     document.querySelector(DOMstrings.GXContainer).addEventListener('click', event => characterAction(event, "GX"));
     document.querySelector(DOMstrings.FiveDSContainer).addEventListener('click', event => characterAction(event, "5DS"));
     document.querySelector(DOMstrings.ZexalContainer).addEventListener('click', event => characterAction(event, "Zexal"));
-    document.getElementById(DOMstrings.SubmitButton).addEventListener('submit', event => addNewCharacter(event));
+    document.getElementById(DOMstrings.SubmitButton).addEventListener('submit', event => formAction(event));
 }
 
 controller()
