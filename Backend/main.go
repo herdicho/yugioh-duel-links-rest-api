@@ -182,6 +182,74 @@ func (db *DB) UpdateCharacter(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// GetGemsSummary function for get all gems summary
+func (db *DB) GetGemsSummary(w http.ResponseWriter, r *http.Request) {
+	var characters []Character
+	err := db.collection.Find(bson.M{}).All(&characters)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	} else {
+		/*res := Result{
+			Code:    200,
+			Payload: characters,
+			Message: "Success get all characters",
+		}
+		w.WriteHeader(http.StatusOK) // give http status (2xx / 3xx / 4xx / 5xx)
+		w.Header().Set("Content-Type", "application/json")
+		response, _ := json.Marshal(res)
+		w.Write(response)*/
+		a := calculateObtainableGems(characters)
+		b := calculateObtainGems(characters)
+		fmt.Println(a, " ", b)
+	}
+}
+
+func calculateObtainableGems(characters []Character) int {
+	totalGems := 0
+	for _, char := range characters {
+		totalGems += calculateGemsByCharType(char.CurrentLV, char.CharType)
+	}
+	return totalGems
+}
+
+func calculateObtainGems(characters []Character) int {
+	totalGems := 0
+	for _, char := range characters {
+		totalGems += calculateGemsByCharType(char.MaxLV, char.CharType)
+	}
+	return totalGems
+}
+
+func calculateGemsByCharType(curLv, charType int) int {
+	// untuk type ke 5 (lv 31 - 45 masih dibuat default value 0)
+	charType1 := [45]int{0, 10, 0, 0, 0, 15, 0, 0, 25, 0, 0, 35, 0, 0, 50, 0, 60, 0, 75, 0, 0, 100, 0, 120, 0, 150, 0, 200, 250, 300, 0, 200, 0, 250, 0, 0, 200, 0, 250, 0, 0, 100, 200, 250, 0}
+	charType2 := [45]int{0, 10, 0, 0, 0, 15, 0, 0, 25, 0, 0, 35, 0, 0, 50, 0, 60, 0, 75, 0, 0, 100, 0, 120, 0, 150, 0, 200, 250, 0, 0, 200, 0, 250, 0, 0, 200, 0, 250, 0, 0, 100, 200, 250, 0}
+	charType3 := [45]int{0, 0, 0, 0, 0, 0, 15, 0, 0, 30, 0, 40, 0, 0, 50, 0, 60, 0, 75, 0, 0, 100, 0, 120, 0, 150, 0, 200, 250, 300, 0, 200, 0, 250, 0, 0, 200, 0, 250, 0, 0, 100, 200, 250, 0}
+	charType4 := [45]int{0, 10, 0, 10, 0, 15, 0, 0, 25, 0, 0, 35, 0, 0, 50, 0, 60, 0, 75, 0, 0, 100, 0, 120, 0, 140, 0, 200, 250, 0, 0, 200, 0, 250, 0, 0, 200, 0, 250, 0, 0, 100, 200, 250, 0}
+	charType5 := [45]int{0, 5, 0, 10, 0, 15, 0, 0, 20, 0, 0, 35, 0, 0, 50, 0, 60, 0, 75, 0, 0, 100, 0, 120, 0, 150, 0, 200, 250, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+
+	totalGems := 0
+	characterType := [45]int{}
+
+	if charType == 1 {
+		characterType = charType1
+	} else if charType == 2 {
+		characterType = charType2
+	} else if charType == 3 {
+		characterType = charType3
+	} else if charType == 4 {
+		characterType = charType4
+	} else if charType == 5 {
+		characterType = charType5
+	}
+
+	for i := 0; i <= curLv-1; i++ {
+		totalGems += characterType[i]
+	}
+
+	return totalGems
+}
+
 func main() {
 	// initiate database connection
 	session, err := mgo.Dial("127.0.0.1")
@@ -200,6 +268,7 @@ func main() {
 	r.HandleFunc("/character", db.GetAllCharacters).Methods("GET")
 	r.HandleFunc("/character-max-lv", db.GetAllMaxLvCharacters).Methods("GET")
 	r.HandleFunc("/character-by-world/{world:[a-zA-Z0-9]*}", db.GetAllCharactersByWorld).Methods("GET")
+	r.HandleFunc("/gems-summary", db.GetGemsSummary).Methods("GET")
 	r.HandleFunc("/character", db.PostCharacter).Methods("POST")
 	r.HandleFunc("/character/{id:[a-zA-Z0-9]*}", db.DeleteCharacter).Methods("DELETE")
 	r.HandleFunc("/character/{id:[a-zA-Z0-9]*}", db.UpdateCharacter).Methods("PUT")
