@@ -38,6 +38,13 @@ type Result struct {
 	Message string      `json:"message"`
 }
 
+// GemsSummary struct for the purpose of payload for gems summary
+type GemsSummary struct {
+	ObtainableGems int `json:"obtainableGems"`
+	ObtainGems     int `json:"obtainGems"`
+	AvailableGems  int `json:"availableGems"`
+}
+
 // GetAllCharacters function for get all of the characters from database
 func (db *DB) GetAllCharacters(w http.ResponseWriter, r *http.Request) {
 	var characters []Character
@@ -189,25 +196,54 @@ func (db *DB) GetGemsSummary(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		w.Write([]byte(err.Error()))
 	} else {
-		/*res := Result{
+		gems := GemsSummary{
+			ObtainableGems: calculateObtainableGems(characters),
+			ObtainGems:     calculateObtainGems(characters),
+			AvailableGems:  calculateObtainableGems(characters) - calculateObtainGems(characters),
+		}
+		res := Result{
 			Code:    200,
-			Payload: characters,
-			Message: "Success get all characters",
+			Payload: gems,
+			Message: "Success get gems summary",
 		}
 		w.WriteHeader(http.StatusOK) // give http status (2xx / 3xx / 4xx / 5xx)
 		w.Header().Set("Content-Type", "application/json")
 		response, _ := json.Marshal(res)
-		w.Write(response)*/
-		a := calculateObtainableGems(characters)
-		b := calculateObtainGems(characters)
-		fmt.Println(a, " ", b)
+		w.Write(response)
+	}
+}
+
+// GetGemsSummaryByWorld function for get gems summary by world
+func (db *DB) GetGemsSummaryByWorld(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	world := strings.ToUpper(vars["world"])
+
+	var characters []Character
+	err := db.collection.Find(bson.M{"world": world}).Sort("-$natural").All(&characters) //Sort("-$natural") = sort descending (ambil database dari bawah)
+	if err != nil {
+		w.Write([]byte(err.Error()))
+	} else {
+		gems := GemsSummary{
+			ObtainableGems: calculateObtainableGems(characters),
+			ObtainGems:     calculateObtainGems(characters),
+			AvailableGems:  calculateObtainableGems(characters) - calculateObtainGems(characters),
+		}
+		res := Result{
+			Code:    200,
+			Payload: gems,
+			Message: "Success get gems summary " + world + " world",
+		}
+		w.WriteHeader(http.StatusOK) // give http status (2xx / 3xx / 4xx / 5xx)
+		w.Header().Set("Content-Type", "application/json")
+		response, _ := json.Marshal(res)
+		w.Write(response)
 	}
 }
 
 func calculateObtainableGems(characters []Character) int {
 	totalGems := 0
 	for _, char := range characters {
-		totalGems += calculateGemsByCharType(char.CurrentLV, char.CharType)
+		totalGems += calculateGemsByCharType(char.MaxLV, char.CharType)
 	}
 	return totalGems
 }
@@ -215,7 +251,7 @@ func calculateObtainableGems(characters []Character) int {
 func calculateObtainGems(characters []Character) int {
 	totalGems := 0
 	for _, char := range characters {
-		totalGems += calculateGemsByCharType(char.MaxLV, char.CharType)
+		totalGems += calculateGemsByCharType(char.CurrentLV, char.CharType)
 	}
 	return totalGems
 }
@@ -269,6 +305,7 @@ func main() {
 	r.HandleFunc("/character-max-lv", db.GetAllMaxLvCharacters).Methods("GET")
 	r.HandleFunc("/character-by-world/{world:[a-zA-Z0-9]*}", db.GetAllCharactersByWorld).Methods("GET")
 	r.HandleFunc("/gems-summary", db.GetGemsSummary).Methods("GET")
+	r.HandleFunc("/gems-summary/{world:[a-zA-Z0-9]*}", db.GetGemsSummaryByWorld).Methods("GET")
 	r.HandleFunc("/character", db.PostCharacter).Methods("POST")
 	r.HandleFunc("/character/{id:[a-zA-Z0-9]*}", db.DeleteCharacter).Methods("DELETE")
 	r.HandleFunc("/character/{id:[a-zA-Z0-9]*}", db.UpdateCharacter).Methods("PUT")
