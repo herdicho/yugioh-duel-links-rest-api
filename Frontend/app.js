@@ -241,3 +241,26 @@ const controller = () => {
 }
 
 controller()
+
+/*var ctx = document.getElementById('myChart').getContext('2d');
+ctx.height = 50;
+var chart = new Chart(ctx, {
+    // The type of chart we want to create
+    type: 'pie',
+
+    data : {
+        datasets: [{
+            data: [97600, 42800],
+            backgroundColor: ["#0074D9", "#FF4136"]
+        }],
+    
+        // These labels appear in the legend and in the tooltips when hovering different arcs
+        labels: [
+            'Red',
+            'Yellow',
+        ]
+    },
+
+    // Configuration options go here
+    options: {}
+});*/

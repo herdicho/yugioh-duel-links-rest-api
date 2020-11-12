@@ -138,7 +138,11 @@ input[type=submit] {
     padding-top: 10px;
 }
 
-.gems-summary-by-world-container > div > div {
+.gems-summary-by-world-container > div > .title {
     margin-bottom: 20px;
     border-bottom: 2px solid black;
 }
+
+/*.chart {
+    margin-top: 10px;
+}*/
