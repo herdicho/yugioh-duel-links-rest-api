@@ -10,6 +10,12 @@ const elements = {
     maxLvField : document.getElementById("maxLv"),
     charTypeField : document.getElementById("charType"),
     formField : document.getElementById("input-form"),
+    GemsSummaryGlobalContainer: document.querySelector('.gems-summary-container'),
+    GemsSummaryDMContainer: document.querySelector('.gems-summary-dm-container'),
+    GemsSummaryDSODContainer: document.querySelector('.gems-summary-dsod-container'),
+    GemsSummaryGXContainer: document.querySelector('.gems-summary-gx-container'),
+    GemsSummary5DSContainer: document.querySelector('.gems-summary-5ds-container'),
+    GemsSummaryZexalContainer: document.querySelector('.gems-summary-zexal-container'),
 }
 
 let idCharacter = "";
@@ -24,7 +30,7 @@ let characterData = {
 
 const loadCharactersListbyWorld = world => { 
 
-    const elementByWorld = getElementByWorld(world)
+    const elementByWorld = getElementListCharacterByWorld(world)
     const url = "http://localhost:8000/character-by-world/"
     const api = url.concat(world)
     
@@ -134,7 +140,41 @@ function addNewCharacter(event) {
    window.location.reload();
 }
 
-const getElementByWorld = world => {
+const loadGemsSummaryGlobal = () => { 
+
+    const api = "http://localhost:8000/gems-summary"
+    
+    fetch(api).
+    then(res => res.json()).
+    then(element => {
+        html = '<h4>Obtainable Gems : %obtainableGems%</h4> <br> <h4>Obtain Gems : %obtainGems%</h4> <br> <h4>Available Gems : %availableGems%</h4>'
+        
+        newHtml = html.replace('%obtainableGems%', element.payload.obtainableGems)
+        newHtml = newHtml.replace('%obtainGems%', element.payload.obtainGems)
+        newHtml = newHtml.replace('%availableGems%', element.payload.availableGems)
+        elements.GemsSummaryGlobalContainer.insertAdjacentHTML('beforeend', newHtml);
+    })
+} 
+
+const loadGemsSummarybyWorld = world => { 
+
+    const elementByWorld = getElementGemsSummaryByWorld(world)
+    const url = "http://localhost:8000/gems-summary/"
+    const api = url.concat(world)
+
+    fetch(api).
+    then(res => res.json()).
+    then(element => {
+        html = '<h4>Obtainable Gems : %obtainableGems%</h4> <br> <h4>Obtain Gems : %obtainGems%</h4> <br> <h4>Available Gems : %availableGems%</h4>'
+        
+        newHtml = html.replace('%obtainableGems%', element.payload.obtainableGems)
+        newHtml = newHtml.replace('%obtainGems%', element.payload.obtainGems)
+        newHtml = newHtml.replace('%availableGems%', element.payload.availableGems)
+        elementByWorld.insertAdjacentHTML('beforeend', newHtml);
+    })
+} 
+
+const getElementListCharacterByWorld = world => {
     if (world === "dm") {
         return elements.DMCharacterListTable
     } else if (world === "dsod") {
@@ -145,6 +185,20 @@ const getElementByWorld = world => {
         return elements.FiveDSCharacterListTable
     } else if (world === "zexal") {
         return elements.ZexalCharacterListTable
+    }
+}
+
+const getElementGemsSummaryByWorld = world => {
+    if (world === "dm") {
+        return elements.GemsSummaryDMContainer
+    } else if (world === "dsod") {
+        return elements.GemsSummaryDSODContainer
+    } else if (world === "gx") {
+        return elements.GemsSummaryGXContainer
+    } else if (world === "5ds") {
+        return elements.GemsSummary5DSContainer
+    } else if (world === "zexal") {
+        return elements.GemsSummaryZexalContainer
     }
 }
 
@@ -168,6 +222,14 @@ const controller = () => {
         loadCharactersListbyWorld("gx")
         loadCharactersListbyWorld("5ds")
         loadCharactersListbyWorld("zexal")
+
+        // load all gems summary on each world
+        loadGemsSummaryGlobal()
+        loadGemsSummarybyWorld("dm")
+        loadGemsSummarybyWorld("dsod")
+        loadGemsSummarybyWorld("gx")
+        loadGemsSummarybyWorld("5ds")
+        loadGemsSummarybyWorld("zexal")
     });
 
     document.querySelector(DOMstrings.DMContainer).addEventListener('click', event => characterAction(event, "DM"));
@@ -179,3 +241,26 @@ const controller = () => {
 }
 
 controller()
+
+/*var ctx = document.getElementById('myChart').getContext('2d');
+ctx.height = 50;
+var chart = new Chart(ctx, {
+    // The type of chart we want to create
+    type: 'pie',
+
+    data : {
+        datasets: [{
+            data: [97600, 42800],
+            backgroundColor: ["#0074D9", "#FF4136"]
+        }],
+    
+        // These labels appear in the legend and in the tooltips when hovering different arcs
+        labels: [
+            'Red',
+            'Yellow',
+        ]
+    },
+
+    // Configuration options go here
+    options: {}
+});*/
