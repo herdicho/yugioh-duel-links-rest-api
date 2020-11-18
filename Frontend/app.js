@@ -10,12 +10,18 @@ const elements = {
     maxLvField : document.getElementById("maxLv"),
     charTypeField : document.getElementById("charType"),
     formField : document.getElementById("input-form"),
-    GemsSummaryGlobalContainer: document.querySelector('.gems-summary-container'),
-    GemsSummaryDMContainer: document.querySelector('.gems-summary-dm-container'),
-    GemsSummaryDSODContainer: document.querySelector('.gems-summary-dsod-container'),
-    GemsSummaryGXContainer: document.querySelector('.gems-summary-gx-container'),
-    GemsSummary5DSContainer: document.querySelector('.gems-summary-5ds-container'),
-    GemsSummaryZexalContainer: document.querySelector('.gems-summary-zexal-container'),
+    GemsSummaryGlobalContainer: document.querySelector('.gems-summary-container').children[0],
+    GemsSummaryDMContainer: document.querySelector('.gems-summary-dm-container').children[0],
+    GemsSummaryDSODContainer: document.querySelector('.gems-summary-dsod-container').children[0],
+    GemsSummaryGXContainer: document.querySelector('.gems-summary-gx-container').children[0],
+    GemsSummary5DSContainer: document.querySelector('.gems-summary-5ds-container').children[0],
+    GemsSummaryZexalContainer: document.querySelector('.gems-summary-zexal-container').children[0],
+    ChartGemsGlobal : 'chartGlobal',
+    ChartGemsDM : 'chartDM',
+    ChartGemsDSOD : 'chartDSOD',
+    ChartGemsGX : 'chartGX',
+    ChartGems5DS : 'chart5DS',
+    ChartGemsZexal : 'chartZexal',
 }
 
 let idCharacter = "";
@@ -141,7 +147,6 @@ function addNewCharacter(event) {
 }
 
 const loadGemsSummaryGlobal = () => { 
-
     const api = "http://localhost:8000/gems-summary"
     
     fetch(api).
@@ -152,7 +157,7 @@ const loadGemsSummaryGlobal = () => {
         newHtml = html.replace('%obtainableGems%', element.payload.obtainableGems)
         newHtml = newHtml.replace('%obtainGems%', element.payload.obtainGems)
         newHtml = newHtml.replace('%availableGems%', element.payload.availableGems)
-        elements.GemsSummaryGlobalContainer.insertAdjacentHTML('beforeend', newHtml);
+        elements.GemsSummaryGlobalContainer.insertAdjacentHTML('afterend', newHtml);
     })
 } 
 
@@ -170,9 +175,81 @@ const loadGemsSummarybyWorld = world => {
         newHtml = html.replace('%obtainableGems%', element.payload.obtainableGems)
         newHtml = newHtml.replace('%obtainGems%', element.payload.obtainGems)
         newHtml = newHtml.replace('%availableGems%', element.payload.availableGems)
-        elementByWorld.insertAdjacentHTML('beforeend', newHtml);
+        elementByWorld.insertAdjacentHTML('afterend', newHtml);
     })
 } 
+
+const loadChartGemsSummaryGlobal = () => {
+    const api = "http://localhost:8000/gems-summary"
+    const chartContainer = elements.ChartGemsGlobal
+
+    fetch(api).
+    then(res => res.json()).
+    then(element => {
+        loadChart(element, chartContainer)
+    })
+}
+
+const loadChartGemsSummarybyWorld = world => {
+    const url = "http://localhost:8000/gems-summary/"
+    const api = url.concat(world)
+    const chartContainer = getContainerChartByWorld(world)
+
+    fetch(api).
+    then(res => res.json()).
+    then(element => {
+        loadChart(element, chartContainer)
+    })
+}
+
+const loadChart = (element, container) => {
+    var ctx = document.getElementById(container).getContext('2d');
+    ctx.height = 50;
+    var chart = new Chart(ctx, {
+        type: 'pie',
+        data : {
+            datasets: [{
+                data: [element.payload.availableGems, element.payload.obtainGems],
+                backgroundColor: ["green", "red"],
+                borderColor : "white",
+                weight : "5"
+            }],
+            labels: [
+                'Obtainable Gems',
+                'Already Obtain Gems',
+            ]
+        },
+        options: {
+            legend: {
+                labels: {
+                    fontColor: "black",
+                    fontSize: 13
+                }
+            },
+            plugins: {
+                labels: {
+                    render: 'percentage',
+                    fontColor : 'black',
+                    fontSize : 16
+                }
+            }
+        }
+    });
+}
+
+const getContainerChartByWorld = world => {
+    if (world === "dm") {
+        return elements.ChartGemsDM
+    } else if (world === "dsod") {
+        return elements.ChartGemsDSOD
+    } else if (world === "gx") {
+        return elements.ChartGemsGX
+    } else if (world === "5ds") {
+        return elements.ChartGems5DS
+    } else if (world === "zexal") {
+        return elements.ChartGemsZexal
+    }
+}
 
 const getElementListCharacterByWorld = world => {
     if (world === "dm") {
@@ -230,6 +307,14 @@ const controller = () => {
         loadGemsSummarybyWorld("gx")
         loadGemsSummarybyWorld("5ds")
         loadGemsSummarybyWorld("zexal")
+
+        // load all chart gems summary on each world
+        loadChartGemsSummaryGlobal()
+        loadChartGemsSummarybyWorld("dm")
+        loadChartGemsSummarybyWorld("dsod")
+        loadChartGemsSummarybyWorld("gx")
+        loadChartGemsSummarybyWorld("5ds")
+        loadChartGemsSummarybyWorld("zexal")
     });
 
     document.querySelector(DOMstrings.DMContainer).addEventListener('click', event => characterAction(event, "DM"));
@@ -241,26 +326,3 @@ const controller = () => {
 }
 
 controller()
-
-/*var ctx = document.getElementById('myChart').getContext('2d');
-ctx.height = 50;
-var chart = new Chart(ctx, {
-    // The type of chart we want to create
-    type: 'pie',
-
-    data : {
-        datasets: [{
-            data: [97600, 42800],
-            backgroundColor: ["#0074D9", "#FF4136"]
-        }],
-    
-        // These labels appear in the legend and in the tooltips when hovering different arcs
-        labels: [
-            'Red',
-            'Yellow',
-        ]
-    },
-
-    // Configuration options go here
-    options: {}
-});*/
