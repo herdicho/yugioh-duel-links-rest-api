@@ -143,6 +143,6 @@ input[type=submit] {
     border-bottom: 2px solid black;
 }
 
-/*.chart {
-    margin-top: 10px;
-}*/
+.chart {
+    padding-top: 50px;
+}
