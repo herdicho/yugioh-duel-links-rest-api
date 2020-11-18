@@ -205,7 +205,7 @@ const loadChartGemsSummarybyWorld = world => {
 const loadChart = (element, container) => {
     var ctx = document.getElementById(container).getContext('2d');
     ctx.height = 50;
-    var chart = new Chart(ctx, {
+    new Chart(ctx, {
         type: 'pie',
         data : {
             datasets: [{
